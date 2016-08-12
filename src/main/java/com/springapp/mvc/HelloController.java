@@ -79,10 +79,46 @@ public class HelloController {
 		 for(String key :contentSet){
 		   map.put(key,content.get(key)[0])	 ;
 		 }
-		 logger.info("map========="+map);
+		 logger.info("map=========" + map);
 		 return map;
 	 }
 	private String  getInputStreamContent(HttpServletRequest request) {
+		ServletInputStream inputStream = null;
+		InputStreamReader reader = null;
+		int len = -1;
+		char[] b = new char[1024];
+		StringBuilder sb = new StringBuilder();
+		JSONObject object = null;
+		String content = null;
+		try {
+			inputStream = request.getInputStream();
+			reader = new InputStreamReader(inputStream, "UTF-8");
+
+			while ((len = reader.read(b, 0, b.length)) != -1) {
+				for (int i = 0; i < len; i++) {
+					sb.append(b[i]);
+				}
+
+			}
+
+			/**
+			 * end wuqinghai
+			 */
+
+			content = sb.toString();
+			logger.info("流内容========="+content);
+
+
+
+
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return content;
+	}
+	private String  getInputStreamContent2(HttpServletRequest request) {
 		ServletInputStream inputStream = null;
 		InputStreamReader reader = null;
 		int len = -1;
