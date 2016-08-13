@@ -1,4 +1,4 @@
 public static void main(String args []){
-printf("山水地、、、 ");
+printf("山水地");
 
 }
