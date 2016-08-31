@@ -4,6 +4,7 @@ import com.ebeijia.base64.BackAES;
 import com.springapp.mvc.entity.LoginInfo;
 import com.springapp.mvc.entity.Person;
 import com.springapp.mvc.entity.RequestWrapper;
+import com.websocket.MyWebSocket;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.groovy.JsonSlurper;
@@ -54,7 +55,7 @@ public class HelloController {
 		String content=getInputStreamContent(request);
 		LoginInfo info = new LoginInfo();
 		info.setMobile("18321841049");
-		info.setPassword("1234567");
+		info.setPassword("1234567" + "websocket连接数量:" + MyWebSocket.getOnlineCount());
 		//返回jsp页面 hello.jsp
 		return info;
 	}

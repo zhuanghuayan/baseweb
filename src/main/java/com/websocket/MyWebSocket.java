@@ -1,6 +1,9 @@
 package com.websocket;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.websocket.OnClose;
@@ -8,20 +11,21 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 /**
  * Created by wuqinghai on 16/8/19.
  */
-@ServerEndpoint(value="/websocket")
+@ServerEndpoint(value="/websocket/{user}")
 public class MyWebSocket {
 
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
+    //private static int onlineCount = 0;
 
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
-    private static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<MyWebSocket>();
-
+   // public static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<MyWebSocket>();
+    public  static Map<String,MyWebSocket> clients=new ConcurrentHashMap<String, MyWebSocket>();
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
 
@@ -30,11 +34,11 @@ public class MyWebSocket {
      * @param session  可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     @OnOpen
-    public void onOpen(Session session){
+    public void onOpen(@PathParam("user")String user,Session session){
         this.session = session;
-        webSocketSet.add(this);     //加入set中
-        addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
+        clients.put(user, this);     //加入set中
+        //addOnlineCount();           //在线数加1
+        System.out.println("有新的客户端"+user+"加入！当前在线人数为" + getOnlineCount());
         try {
             sendMessage("欢迎来到益倍嘉");
         } catch (IOException e) {
@@ -46,9 +50,10 @@ public class MyWebSocket {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose(){
-        webSocketSet.remove(this);  //从set中删除
-        subOnlineCount();           //在线数减1
+    public void onClose(@PathParam("user")String user){
+        clients.remove(user) ; //从set中删除
+        System.out.println("移除客户端:"+user);
+        //subOnlineCount();           //在线数减1
         System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
 
     }
@@ -59,11 +64,12 @@ public class MyWebSocket {
      * @param session 可选的参数
      */
     @OnMessage
-    public void onMessage(String message, Session session) {
-        System.out.println("来自客户端的消息:" + message);
+    public void onMessage(@PathParam("user")String user,String message, Session session) {
+        System.out.println("来自客户端"+user+"+的消息:" + message);
 
         //群发消息
-        for(MyWebSocket item: webSocketSet){
+      Collection<MyWebSocket> all= clients.values();
+        for(MyWebSocket item: all){
             try {
                 item.sendMessage(message);
             } catch (IOException e) {
@@ -79,9 +85,13 @@ public class MyWebSocket {
      * @param error
      */
     @OnError
-    public void onError(Session session, Throwable error){
-        System.out.println("发生错误");
+    public void onError(@PathParam("user")String user,Session session, Throwable error){
+        System.out.println(user+"----发生错误");
         error.printStackTrace();
+        System.out.println("移除客户端:"+user);
+        clients.remove(user) ; //从set中删除
+        //subOnlineCount();           //在线数减1
+        System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
     }
 
     /**
@@ -91,19 +101,20 @@ public class MyWebSocket {
      */
     public void sendMessage(String message) throws IOException{
         this.session.getBasicRemote().sendText(message);
+
         //this.session.getAsyncRemote().sendText(message);
     }
 
     public static synchronized int getOnlineCount() {
-        return onlineCount;
+        return clients.size();
     }
 
-    public static synchronized void addOnlineCount() {
+   /* public static synchronized void addOnlineCount() {
         MyWebSocket.onlineCount++;
-    }
+    }*/
 
-    public static synchronized void subOnlineCount() {
+   /* public static synchronized void subOnlineCount() {
         MyWebSocket.onlineCount--;
-    }
+    }*/
 
 }
