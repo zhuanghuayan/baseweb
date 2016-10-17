@@ -6,7 +6,6 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>wuqinghai</name>
-
     <properties>
         <spring.version>4.1.1.RELEASE</spring.version>
     </properties>

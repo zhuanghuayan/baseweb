@@ -25,10 +25,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLEncoder;
+import java.security.spec.ECField;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +43,6 @@ public class HelloController {
 	public  static String password = "RgbN5PzsRgbN5Pzs";
 	private final static Log logger = LogFactory.getLog(HelloController.class);
 
-
-
 	@RequestMapping( value = "/login",method = {RequestMethod.POST,RequestMethod.GET})
 	@ResponseBody
 	public LoginInfo login(ModelMap model,HttpServletRequest request,HttpServletResponse response) {
@@ -55,7 +53,7 @@ public class HelloController {
 		String content=getInputStreamContent(request);
 		LoginInfo info = new LoginInfo();
 		info.setMobile("18321841049");
-		info.setPassword("1234567" + "websocket连接数量:" + MyWebSocket.getOnlineCount());
+		info.setPassword("1234567" + "websocket连接数量:"+MyWebSocket.getOnlineCount());
 		//返回jsp页面 hello.jsp
 		return info;
 	}
@@ -73,6 +71,49 @@ public class HelloController {
 		//返回jsp页面 hello.jsp
 		return "hello";
 	}
+	@RequestMapping( value = "/apk",method = {RequestMethod.POST,RequestMethod.GET})
+	public void apk(ModelMap model,HttpServletRequest request,HttpServletResponse response) {
+		//ModelMap 用于返回时，传输值给页面的，不是用于获取前台传送过来的数据，默认为空，如果 response 返回的页面，可以放数据里面，到时候可以在页面里面取出来，显示在页面上面
+		//logger.info(model);
+		BufferedInputStream in = null;
+		BufferedOutputStream out = null;
+	response.setContentType("application/octet-stream");
+	response.setCharacterEncoding("utf-8");
+		try {
+	response.setHeader("Content-disposition", "attachment; filename=\"" + URLEncoder.encode("app-debug.apk", "UTF-8") + "\"");
+
+
+		in = new BufferedInputStream(new FileInputStream("/Users/wuqinghai/Documents/android/SystemFloatWindow/1.0_SystemFloatWindow_release.apk"));
+		response.setHeader("Content-Length",in.available()+"");
+		out = new BufferedOutputStream(response.getOutputStream());
+		byte[] buff = new byte[2048];
+		int bytesRead;
+		while (-1 != (bytesRead = in.read(buff, 0, buff.length))) {
+			out.write(buff, 0, bytesRead);
+		}
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+ finally {
+	if(in!=null){
+	try {in.close();}catch (Exception e){};
+	}
+	if(out!=null){
+		try {
+			out.close();
+		}
+		catch (Exception e){
+
+		}
+	}
+}
+
+
+		}
+
+
+
      private Map<String,String > getKeyValue(HttpServletRequest request){
 		 Map<String,String> map=new HashMap<String, String>();
 		 Map<String,String[]> content=   request.getParameterMap();
