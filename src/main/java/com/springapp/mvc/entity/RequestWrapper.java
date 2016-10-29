@@ -2,43 +2,37 @@ package com.springapp.mvc.entity;
 
 import java.util.Map;
 
-/**
- * @Title:
- * @Package
- * @Description:
- * @author chenxu
- * @date 2015/4/30
- */
+
 public class RequestWrapper {
 
-    private String bizContent;
+   /* {“sendTime”:” 12232312313”,”version”:”1.0”,
+    ”appType”:”03”,”authToken”:” QYVD8W2JJW4KYDP2YMKWFX36”,
+        devId:”fefsdfsdffd”,”data”:{“user”:”root”,”pwd”:”111111”}
+        ,”signType”:”01”,”sign”:”qwgggjjmutydfg01gfbdfgfgfdertyujk”}*/
 
+    private String data;
     private String signType;
-
+    private String appType;
     private String version;
     private String authToken;
-
     private String sign;
+    private String devId;
+    private String sendTime;
 
-    private String sysId;
-
-
-    private String timestamp;
-
-    public String getBizContent() {
-        return bizContent;
+    public String getSendTime() {
+        return sendTime;
     }
 
-    public void setBizContent(String bizContent) {
-        this.bizContent = bizContent;
+    public void setSendTime(String sendTime) {
+        this.sendTime = sendTime;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getData() {
+        return data;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getSignType() {
@@ -47,6 +41,14 @@ public class RequestWrapper {
 
     public void setSignType(String signType) {
         this.signType = signType;
+    }
+
+    public String getAppType() {
+        return appType;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
     }
 
     public String getVersion() {
@@ -73,13 +75,17 @@ public class RequestWrapper {
         this.sign = sign;
     }
 
-    public String getSysId() {
-        return sysId;
+    public String getDevId() {
+        return devId;
     }
 
-    public void setSysId(String sysId) {
-        this.sysId = sysId;
+    public void setDevId(String devId) {
+        this.devId = devId;
     }
+
+
+
+
 
 
 }

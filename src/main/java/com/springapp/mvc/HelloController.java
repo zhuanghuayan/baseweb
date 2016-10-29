@@ -1,9 +1,11 @@
 package com.springapp.mvc;
 
 import com.ebeijia.base64.BackAES;
+import com.springapp.mvc.entity.APKEntity;
 import com.springapp.mvc.entity.LoginInfo;
 import com.springapp.mvc.entity.Person;
 import com.springapp.mvc.entity.RequestWrapper;
+import com.springapp.mvc.service.SoftService;
 import com.websocket.MyWebSocket;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
@@ -13,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,10 +42,13 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/Hello")
-public class HelloController {
+public class HelloController extends BaseController{
+	@Resource
+    private SoftService softService;
+
 	public  static String encode="UTF-8";
 	public  static String password = "RgbN5PzsRgbN5Pzs";
-	private final static Log logger = LogFactory.getLog(HelloController.class);
+
 
 	@RequestMapping( value = "/login",method = {RequestMethod.POST,RequestMethod.GET})
 	@ResponseBody
@@ -53,8 +60,12 @@ public class HelloController {
 		String content=getInputStreamContent(request);
 		LoginInfo info = new LoginInfo();
 		info.setMobile("18321841049");
-		info.setPassword("1234567" + "websocket连接数量:"+MyWebSocket.getOnlineCount());
+		info.setPassword("1234567" + "websocket连接数量:" + MyWebSocket.getOnlineCount());
 		//返回jsp页面 hello.jsp
+	   APKBean bean=	softService.getAllSoft().get(0);
+		APKEntity entity=softService.getAllSoftWithTypeName().get(0);
+		System.out.print(entity.toString());
+        logger.info(bean.toString());
 		return info;
 	}
 
@@ -80,7 +91,7 @@ public class HelloController {
 	response.setContentType("application/octet-stream");
 	response.setCharacterEncoding("utf-8");
 		try {
-	response.setHeader("Content-disposition", "attachment; filename=\"" + URLEncoder.encode("app-debug.apk", "UTF-8") + "\"");
+	    response.setHeader("Content-disposition", "attachment; filename=\"" + URLEncoder.encode("app-debug.apk", "UTF-8") + "\"");
 
 
 		in = new BufferedInputStream(new FileInputStream("/Users/wuqinghai/Documents/android/SystemFloatWindow/1.0_SystemFloatWindow_release.apk"));
@@ -114,52 +125,7 @@ public class HelloController {
 
 
 
-     private Map<String,String > getKeyValue(HttpServletRequest request){
-		 Map<String,String> map=new HashMap<String, String>();
-		 Map<String,String[]> content=   request.getParameterMap();
-		Set<String> contentSet=content.keySet();
-		 for(String key :contentSet){
-		   map.put(key,content.get(key)[0])	 ;
-		 }
-		 logger.info("map=========" + map);
-		 return map;
-	 }
-	private String  getInputStreamContent(HttpServletRequest request) {
-		ServletInputStream inputStream = null;
-		InputStreamReader reader = null;
-		int len = -1;
-		char[] b = new char[1024];
-		StringBuilder sb = new StringBuilder();
-		JSONObject object = null;
-		String content = null;
-		try {
-			inputStream = request.getInputStream();
-			reader = new InputStreamReader(inputStream, "UTF-8");
 
-			while ((len = reader.read(b, 0, b.length)) != -1) {
-				for (int i = 0; i < len; i++) {
-					sb.append(b[i]);
-				}
-
-			}
-
-			/**
-			 * end wuqinghai
-			 */
-
-			content = sb.toString();
-			logger.info("流内容========="+content);
-
-
-
-
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return content;
-	}
 	private String  getInputStreamContent2(HttpServletRequest request) {
 		ServletInputStream inputStream = null;
 		InputStreamReader reader = null;
@@ -244,7 +210,7 @@ public class HelloController {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-    JSONObject o=   JSONObject.fromObject(wrapper.getBizContent());
+    JSONObject o=   JSONObject.fromObject(wrapper.getData());
 
 		JSONObject ooo=o.getJSONObject("type");
 

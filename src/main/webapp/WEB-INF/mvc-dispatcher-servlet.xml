@@ -8,7 +8,8 @@
 <!--这个文件的命名 与 web.xml <servlet-name>mvc-dispatcher</servlet-name> 中的mvc-dispatcher-servlet-->
     <context:component-scan base-package="com.springapp.mvc"/>
     <context:annotation-config />
-    <mvc:annotation-driven/><!-- 这句话可以转换 对象为JSON字符串-->
+    <!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+    <mvc:annotation-driven/>
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
@@ -27,7 +28,7 @@
             </list>
         </property>
     </bean>-->
-
+    <!-- 启动SpringMVC的注解功能，完成请求和注解POJO的映射 -->
 
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
         <property name="messageConverters">
@@ -36,7 +37,7 @@
             </list>
         </property>
     </bean>
-
+<!--json 需要配置 @ResponseBody 不加@ResponseBody 默认 返回网页-->
     <bean id="mappingJacksonHttpMessageConverter"
           class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
         <property name="supportedMediaTypes">
@@ -46,4 +47,8 @@
             </list>
         </property>
     </bean>
+
+
+
+
 </beans>
